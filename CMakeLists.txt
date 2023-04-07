@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 17)
 
 link_libraries(ws2_32 wsock32)
 
-add_executable(serverPD src/main.cpp)
+add_executable(serverPD src/main.cpp src/server/server.cpp)
