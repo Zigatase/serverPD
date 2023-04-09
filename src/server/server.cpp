@@ -1,9 +1,5 @@
 #include "server.h"
 
-#pragma comment (lib, "ws2_32.lib")
-
-using namespace std;
-
 void Server()
 {
     // Initialze winsock
