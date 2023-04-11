@@ -102,11 +102,14 @@ void Server()
                     SOCKET outSock = master.fd_array[(int)buf[0] - 48];
                     if (outSock != listening && outSock != sock)
                     {
+                        //
                         string command = buf;
                         string sendCommand;
 
+                        // deleting 1 and 2 characters (1 -Test -> -Test)
                         sendCommand = command.substr(2, command.size() -2);
 
+                        // Send Command
                         send(outSock, sendCommand.c_str(), sendCommand.size() + 1, 0);
                     }
                 }
