@@ -114,7 +114,7 @@ void Server()
     // Remove the listening socket from the master file descriptor set and close it
     // to prevent anyone else trying to connect.
     FD_CLR(listening, &master);
-    closesocket(listening);E
+    closesocket(listening);
 
     // Message to let users know what's happening.
     string msg = "Server is shutting down. Goodbye\r\n";
