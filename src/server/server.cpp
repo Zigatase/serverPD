@@ -89,9 +89,8 @@ void Server()
                 }
                 else
                 {
-                    // Check to see if it's a command. \quit kills the server
-                    string cmd = string(buf, bytesIn);
-                    if (cmd == "123")
+                    // Check to see if it's a command. -KillServer kills the server
+                    if (buf == string("-KillServer"))
                     {
                         cout << "Kill Server!";
                         running = false;
