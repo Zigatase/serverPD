@@ -104,7 +104,7 @@ void Server()
                 // A == Adding dataPC Client.
                 else if (buf[0] == 'A')
                 {
-                    dataPC += string(buf).substr(2, string(buf).size() - 2) + "\n";
+                    dataPC += to_string(master.fd_count - 1) + " "+ string(buf).substr(2, string(buf).size() - 2) + "\n";
 
                     cout << dataPC;
                 }
