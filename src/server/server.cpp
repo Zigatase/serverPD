@@ -108,18 +108,13 @@ void Server()
                     }
                 }
             }
-            SOCKET outSock = master.fd_array[1];
-            string welcomeMsg1 = "-Test2";
-
-            send(outSock, welcomeMsg1.c_str(), welcomeMsg1.size() + 1, 0);
-            send(outSock, welcomeMsg1.c_str(), welcomeMsg1.size() + 1, 0);
         }
     }
 
     // Remove the listening socket from the master file descriptor set and close it
     // to prevent anyone else trying to connect.
     FD_CLR(listening, &master);
-    closesocket(listening);
+    closesocket(listening);E
 
     // Message to let users know what's happening.
     string msg = "Server is shutting down. Goodbye\r\n";
