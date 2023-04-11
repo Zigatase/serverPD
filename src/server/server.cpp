@@ -21,81 +21,116 @@ void Server()
         return;
     }
 
-    // Logging start server
-    cout << "Server Starting!" << endl;
-
     // Bind the ip address and port to a socket
-    sockaddr_in hint{};
+    sockaddr_in hint;
     hint.sin_family = AF_INET;
     hint.sin_port = htons(13254);
     hint.sin_addr.S_un.S_addr = INADDR_ANY; // Could also use inet_pton ....
 
-    if (bind(listening, (sockaddr*)&hint, sizeof(hint)) == SOCKET_ERROR)
-    {
-        ShowLastError();
-        return;
-    }
+    bind(listening, (sockaddr*)&hint, sizeof(hint));
 
     // Tell Winsock the socket is for listening
     listen(listening, SOMAXCONN);
 
-    // Wait for a connection
-    sockaddr_in client{};
-    int clientSize = sizeof(client);
+    // Create the master file descriptor set and zero it
+    fd_set master;
+    FD_ZERO(&master);
 
-    SOCKET clientSocket = accept(listening, (sockaddr*)&client, &clientSize);
+    // Add our first socket that we're interested in interacting with; the listening socket!
+    // It's important that this socket is added for our server or else we won't 'hear' incoming
+    // Connections
+    FD_SET(listening, &master);
 
-    char host[NI_MAXHOST];		// Client's remote name
-    char service[NI_MAXSERV];	// Service (i.e. port) the client is connect on
+    // This will be changed by the \quit command (see below, bonus not in video!)
+    bool running = true;
 
-    ZeroMemory(host, NI_MAXHOST); // same as memset(host, 0, NI_MAXHOST);
-    ZeroMemory(service, NI_MAXSERV);
+    //
+    cout << "Server Starting!\n";
 
-    if (getnameinfo((sockaddr*)&client, sizeof(client), host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0)
+    while (running)
     {
-        cout << host << " connected on port " << service << endl;
-    }
-    else
-    {
-        inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
-        cout << host << " connected on port " <<
-             ntohs(client.sin_port) << endl;
+        fd_set copy = master;
+
+        // See who's talking to us
+        int socketCount = select(0, &copy, nullptr, nullptr, nullptr);
+
+        // Loop through all the current connections / potential connect
+        for (int i = 0; i < socketCount; i++)
+        {
+            // Makes things easy for us doing this assignment
+            SOCKET sock = copy.fd_array[i];
+
+            // Is it an inbound communication?
+            if (sock == listening)
+            {
+                // Accept a new connection
+                SOCKET client = accept(listening, nullptr, nullptr);
+
+                // Add the new connection to the list of connected clients
+                FD_SET(client, &master);
+
+                // Send a welcome message to the connected client
+                string welcomeMsg = "Test";
+                send(client, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
+            }
+            else // It's an inbound message
+            {
+                char buf[4096];
+                ZeroMemory(buf, 4096);
+
+                // Receive message
+                int bytesIn = recv(sock, buf, 4096, 0);
+
+                if (bytesIn <= 0)
+                {
+                    // Drop the client
+                    closesocket(sock);
+                    FD_CLR(sock, &master);
+                }
+                else
+                {
+                    // Check to see if it's a command. \quit kills the server
+                    string cmd = string(buf, bytesIn);
+                    if (cmd == "123")
+                    {
+                        cout << "Kill Server!";
+                        running = false;
+                        break;
+                    }
+
+                    //
+                    SOCKET outSock = master.fd_array[1];
+                    if (outSock != listening && outSock != sock)
+                    {
+                        string command = buf;
+
+                        send(outSock, command.c_str(), command.size() + 1, 0);
+                    }
+                }
+            }
+        }
     }
 
-    // Close listening socket
+    // Remove the listening socket from the master file descriptor set and close it
+    // to prevent anyone else trying to connect.
+    FD_CLR(listening, &master);
     closesocket(listening);
 
-    // While loop: accept and echo message back to client
-    char buf[4096];
+    // Message to let users know what's happening.
+    string msg = "Server is shutting down. Goodbye\r\n";
 
-    while (true)
+    while (master.fd_count > 0)
     {
-        ZeroMemory(buf, 4096);
+        // Get the socket number
+        SOCKET sock = master.fd_array[0];
 
-        // Wait for client to send data
-        int bytesReceived = recv(clientSocket, buf, 4096, 0);
-        if (bytesReceived == SOCKET_ERROR)
-        {
-            cerr << "Error in recv(). Quitting" << endl;
-            break;
-        }
+        // Send the goodbye message
+        send(sock, msg.c_str(), msg.size() + 1, 0);
 
-        if (bytesReceived == 0)
-        {
-            cout << "Client disconnected " << endl;
-            break;
-        }
-
-        // CM = Client Message
-        cout << "[CM] -> " << string(buf, 0, bytesReceived) << endl;
-
-        // Echo message back to client
-        send(clientSocket, buf, bytesReceived + 1, 0);
-
+        // Remove it from the master file list and close the socket
+        FD_CLR(sock, &master);
+        closesocket(sock);
     }
-
-    // Close the socket
-    closesocket(clientSocket);
 
     // Cleanup winsock
     WSACleanup();
