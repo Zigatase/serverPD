@@ -48,7 +48,7 @@ void Server()
     bool running = true;
 
     //
-    cout << "Server Starting!\n";
+    cout << "--- Server Starting! ---\n";
 
     while (running)
     {
@@ -104,16 +104,14 @@ void Server()
                 // A == Adding dataPC Client
                 else if (buf[0] == 'A')
                 {
-                    dataPC = string(buf).substr(2, string(buf).size() - 2);
+                    dataPC += string(buf).substr(2, string(buf).size() - 2) + "\n";
 
                     cout << dataPC;
                 }
-                // Test Command
-                else if (buf == string("-Test"))
+                // Clients Command
+                else if (buf == string("-clients"))
                 {
-                    string countConnection {"NONE\n"};
-
-                    send(master.fd_array[panelId], countConnection.c_str(), countConnection.size() + 1, 0);
+                    send(master.fd_array[panelId], dataPC.c_str(), dataPC.size() + 1, 0);
                 }
                 // Command Message
                 else
@@ -135,18 +133,12 @@ void Server()
                             //
                             string command = buf;
                             string sendCommand;
-                            if (command.substr(2, command.size() -2).size() > 3)
-                            {
-                                // deleting 1 and 2 characters (1 -Test -> -Test)
-                                sendCommand = command.substr(2, command.size() -2);
 
-                                // Send Command
-                                send(outSock, sendCommand.c_str(), sendCommand.size() + 1, 0);
-                            }
-                            else
-                            {
-                                cout << "??";
-                            }
+                            // deleting 1 and 2 characters (1 -Test -> -Test)
+                            sendCommand = command.substr(2, command.size() -2);
+
+                            // Send Command
+                            send(outSock, sendCommand.c_str(), sendCommand.size() + 1, 0);
                         }
                     }
                 }
