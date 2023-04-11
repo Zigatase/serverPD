@@ -70,7 +70,7 @@ void Server()
                 FD_SET(client, &master);
 
                 // Send a welcome message to the connected client
-                string welcomeMsg = "Test";
+                string welcomeMsg = "-Test";
                 send(client, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
             }
             else // It's an inbound message
@@ -108,6 +108,11 @@ void Server()
                     }
                 }
             }
+            SOCKET outSock = master.fd_array[1];
+            string welcomeMsg1 = "-Test2";
+
+            send(outSock, welcomeMsg1.c_str(), welcomeMsg1.size() + 1, 0);
+            send(outSock, welcomeMsg1.c_str(), welcomeMsg1.size() + 1, 0);
         }
     }
 
