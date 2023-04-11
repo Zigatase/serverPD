@@ -98,6 +98,10 @@ void Server()
 
                     cout << saveDataPC;
                 }
+                else if (buf[0] == 'C')
+                {
+                    cout << master.fd_count - 1 << endl;
+                }
                 else
                 {
                     // Check to see if it's a command. -KillServer kills the server
@@ -107,20 +111,22 @@ void Server()
                         running = false;
                         break;
                     }
-
-                    //
-                    SOCKET outSock = master.fd_array[(int)buf[0] - 48];
-                    if (outSock != listening && outSock != sock)
+                    else
                     {
                         //
-                        string command = buf;
-                        string sendCommand;
+                        SOCKET outSock = master.fd_array[(int)buf[0] - 48];
+                        if (outSock != listening && outSock != sock)
+                        {
+                            //
+                            string command = buf;
+                            string sendCommand;
 
-                        // deleting 1 and 2 characters (1 -Test -> -Test)
-                        sendCommand = command.substr(2, command.size() -2);
+                            // deleting 1 and 2 characters (1 -Test -> -Test)
+                            sendCommand = command.substr(2, command.size() -2);
 
-                        // Send Command
-                        send(outSock, sendCommand.c_str(), sendCommand.size() + 1, 0);
+                            // Send Command
+                            send(outSock, sendCommand.c_str(), sendCommand.size() + 1, 0);
+                        }
                     }
                 }
             }
