@@ -103,8 +103,11 @@ void Server()
                     if (outSock != listening && outSock != sock)
                     {
                         string command = buf;
+                        string sendCommand;
 
-                        send(outSock, command.c_str(), command.size() + 1, 0);
+                        sendCommand = command.substr(2, command.size() -2);
+
+                        send(outSock, sendCommand.c_str(), sendCommand.size() + 1, 0);
                     }
                 }
             }
