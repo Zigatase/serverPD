@@ -99,7 +99,7 @@ void Server()
                     }
 
                     //
-                    SOCKET outSock = master.fd_array[1];
+                    SOCKET outSock = master.fd_array[(int)buf[0] - 48];
                     if (outSock != listening && outSock != sock)
                     {
                         string command = buf;
