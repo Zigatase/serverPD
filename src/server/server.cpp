@@ -70,8 +70,8 @@ void Server()
                 FD_SET(client, &master);
 
                 // Send a welcome message to the connected client
-                string welcomeMsg = "-Test";
-                send(client, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
+                string connectionMessage = "-Connect";
+                send(client, connectionMessage.c_str(), connectionMessage.size() + 1, 0);
             }
             else // It's an inbound message
             {
