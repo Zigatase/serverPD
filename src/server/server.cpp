@@ -101,7 +101,7 @@ void Server()
                     cout << panelId << endl;
                 }
                 // Special Command Server
-                // A == Adding dataPC Client
+                // A == Adding dataPC Client.
                 else if (buf[0] == 'A')
                 {
                     dataPC += string(buf).substr(2, string(buf).size() - 2) + "\n";
