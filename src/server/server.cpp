@@ -5,7 +5,7 @@ u_int panelId;
 
 void Server()
 {
-    // Initialze winsock
+    // Initialize WinSock
     WSADATA wsData;
     WORD ver = MAKEWORD(2, 2);
 
