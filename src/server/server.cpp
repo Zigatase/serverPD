@@ -63,6 +63,9 @@ void Server()
             // Is it an inbound communication?
             if (sock == listening)
             {
+                char buf[4096];
+                ZeroMemory(buf, 4096);
+
                 // Accept a new connection
                 SOCKET client = accept(listening, nullptr, nullptr);
 
@@ -75,6 +78,7 @@ void Server()
             }
             else // It's an inbound message
             {
+
                 char buf[4096];
                 ZeroMemory(buf, 4096);
 
@@ -87,12 +91,19 @@ void Server()
                     closesocket(sock);
                     FD_CLR(sock, &master);
                 }
+                else if (buf[0] == 'A')
+                {
+                    string dataPC = buf;
+                    string saveDataPC = dataPC.substr(2, dataPC.size() -2);
+
+                    cout << saveDataPC;
+                }
                 else
                 {
                     // Check to see if it's a command. -KillServer kills the server
                     if (buf == string("-KillServer"))
                     {
-                        cout << "Kill Server!";
+                        cout << "Kill Server!\n";
                         running = false;
                         break;
                     }
