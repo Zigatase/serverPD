@@ -1,5 +1,8 @@
 #include "server.h"
 
+string dataPC;
+u_int panelId;
+
 void Server()
 {
     // Initialze winsock
@@ -91,17 +94,28 @@ void Server()
                     closesocket(sock);
                     FD_CLR(sock, &master);
                 }
+                // Saving panelId Socket
+                else if (buf[0] == 'P')
+                {
+                    panelId = master.fd_count - 1;
+                    cout << panelId << endl;
+                }
+                // Special Command Server
+                // A == Adding dataPC Client
                 else if (buf[0] == 'A')
                 {
-                    string dataPC = buf;
-                    string saveDataPC = dataPC.substr(2, dataPC.size() -2);
+                    dataPC = string(buf).substr(2, string(buf).size() - 2);
 
-                    cout << saveDataPC;
+                    cout << dataPC;
                 }
-                else if (buf[0] == 'C')
+                // Test Command
+                else if (buf == string("-Test"))
                 {
-                    cout << master.fd_count - 1 << endl;
+                    string countConnection {"NONE\n"};
+
+                    send(master.fd_array[panelId], countConnection.c_str(), countConnection.size() + 1, 0);
                 }
+                // Command Message
                 else
                 {
                     // Check to see if it's a command. -KillServer kills the server
@@ -111,6 +125,7 @@ void Server()
                         running = false;
                         break;
                     }
+                    // Command Send To Client
                     else
                     {
                         //
@@ -120,12 +135,18 @@ void Server()
                             //
                             string command = buf;
                             string sendCommand;
+                            if (command.substr(2, command.size() -2).size() > 3)
+                            {
+                                // deleting 1 and 2 characters (1 -Test -> -Test)
+                                sendCommand = command.substr(2, command.size() -2);
 
-                            // deleting 1 and 2 characters (1 -Test -> -Test)
-                            sendCommand = command.substr(2, command.size() -2);
-
-                            // Send Command
-                            send(outSock, sendCommand.c_str(), sendCommand.size() + 1, 0);
+                                // Send Command
+                                send(outSock, sendCommand.c_str(), sendCommand.size() + 1, 0);
+                            }
+                            else
+                            {
+                                cout << "??";
+                            }
                         }
                     }
                 }
