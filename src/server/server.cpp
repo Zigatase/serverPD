@@ -1,6 +1,6 @@
 #include "server.h"
 
-string dataPC;
+string dataPC {"| id | username | os | file |\n"};
 u_int panelId;
 
 void Server()
