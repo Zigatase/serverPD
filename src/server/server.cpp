@@ -1,6 +1,8 @@
 #include "server.h"
 
-string dataPC {"| id | username | os | file |\n"};
+string dataPC {"|---------------------------|\n"
+               "| id | username | os | file |\n"
+               "|---------------------------|\n"};
 u_int panelId;
 
 void Server()
@@ -106,7 +108,7 @@ void Server()
                 // A == Adding dataPC Client.
                 else if (buf[0] == 'A')
                 {
-                    dataPC += to_string(master.fd_count - 1) + " "+ string(buf).substr(2, string(buf).size() - 2) + "\n";
+                    dataPC += "| " + to_string(master.fd_count - 1) + " | "+ string(buf).substr(2, string(buf).size() - 2) + "\n";
 
                     cout << dataPC;
                 }
