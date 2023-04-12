@@ -25,10 +25,12 @@ void Server()
     }
 
     // Bind the ip address and port to a socket
-    sockaddr_in hint;
-    hint.sin_family = AF_INET;
-    hint.sin_port = htons(13254);
-    hint.sin_addr.S_un.S_addr = INADDR_ANY; // Could also use inet_pton ....
+    sockaddr_in hint
+            {
+                    hint.sin_family = AF_INET,
+                    hint.sin_port = htons(13254),
+                    static_cast<u_char>(hint.sin_addr.S_un.S_addr = INADDR_ANY) // Could also use inet_pton ....
+            };
 
     bind(listening, (sockaddr*)&hint, sizeof(hint));
 
@@ -151,38 +153,8 @@ void Server()
     FD_CLR(listening, &master);
     closesocket(listening);
 
-    // Message to let users know what's happening.
-    string msg = "Server is shutting down. Goodbye\r\n";
-
-    while (master.fd_count > 0)
-    {
-        // Get the socket number
-        SOCKET sock = master.fd_array[0];
-
-        // Send the goodbye message
-        send(sock, msg.c_str(), msg.size() + 1, 0);
-
-        // Remove it from the master file list and close the socket
-        FD_CLR(sock, &master);
-        closesocket(sock);
-    }
-
     // Cleanup winsock
     WSACleanup();
 
     system("pause");
-}
-
-void ShowLastError()
-{
-    wchar_t* s = nullptr;
-    FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                   FORMAT_MESSAGE_FROM_SYSTEM |
-                   FORMAT_MESSAGE_IGNORE_INSERTS,
-                   nullptr,
-                   WSAGetLastError(),
-                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   (LPWSTR)&s, 0, nullptr);
-    fprintf(stderr, "%S\n", s);
-    LocalFree(s);
 }
