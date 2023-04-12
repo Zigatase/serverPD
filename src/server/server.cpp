@@ -26,11 +26,11 @@ void Server()
 
     // Bind the ip address and port to a socket
     sockaddr_in hint
-            {
-                    hint.sin_family = AF_INET,
-                    hint.sin_port = htons(13254),
-                    static_cast<u_char>(hint.sin_addr.S_un.S_addr = INADDR_ANY) // Could also use inet_pton ....
-            };
+    {
+        hint.sin_family = AF_INET,
+        hint.sin_port = htons(13254),
+        static_cast<u_char>(hint.sin_addr.S_un.S_addr = INADDR_ANY) // Could also use inet_pton ....
+    };
 
     bind(listening, (sockaddr*)&hint, sizeof(hint));
 
